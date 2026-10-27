@@ -22,6 +22,12 @@ export const SCENES: SceneDef[] = [
     hint: 'Your fingers are the tentacles · C switches creature · spread fingers for fins · pinch = dragon breath',
     load: () => import('./finger-puppet/FingerPuppet'),
   },
-  { key: '3', id: 'weather', title: 'Weather in Your Hands', hint: '' },
+  {
+    key: '3',
+    id: 'weather',
+    title: 'Weather in Your Hands',
+    hint: 'Open left hand = cloud · right pinch = rain · quick pinch = lightning · W = weather',
+    load: () => import('./weather/Weather'),
+  },
   { key: '4', id: 'galaxy', title: 'Pour a Galaxy', hint: '' },
 ];

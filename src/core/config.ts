@@ -76,6 +76,6 @@ export const debugConfig = {
 export const simConfig = {
   /** Palm length (wrist → middle knuckle) in px at default zoom. */
   palmPx: 120,
-  closeSpeed: 6,
+  closeSpeed: 12,
   tiltSpeed: 2.2,
 };
