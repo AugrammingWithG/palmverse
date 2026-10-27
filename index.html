@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <meta name="theme-color" content="#07060d" />
+    <title>Palmverse</title>
+    <meta name="description" content="Living 3D worlds that sit in your hands. Hand-tracked in the browser." />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="app">
+      <video id="webcam" playsinline muted autoplay></video>
+      <canvas id="gl"></canvas>
+      <canvas id="skeleton"></canvas>
+
+      <div id="frame-guide" hidden>
+        <div class="frame-guide__window"></div>
+      </div>
+
+      <div id="hud" class="ui">
+        <nav id="menu" aria-label="Scenes"></nav>
+        <div id="status">
+          <span id="fps">-- fps</span>
+          <span id="source"></span>
+          <span id="hands"></span>
+        </div>
+        <button id="help-btn" class="chip" aria-label="Controls">?</button>
+      </div>
+
+      <aside id="help" class="ui panel" hidden>
+        <h2>Controls</h2>
+        <dl>
+          <dt>0–4</dt><dd>Switch scene</dd>
+          <dt>H</dt><dd>Hand skeleton overlay</dd>
+          <dt>G</dt><dd>Tuning panel</dd>
+          <dt>R</dt><dd>Recording mode (hides all UI)</dd>
+          <dt>F</dt><dd>9:16 frame guide</dd>
+          <dt>M</dt><dd>Camera ↔ mouse hand</dd>
+        </dl>
+        <h3>Mouse hand</h3>
+        <dl>
+          <dt>Move</dt><dd>Right hand</dd>
+          <dt>Hold click</dt><dd>Close fist</dd>
+          <dt>Shift / right-click</dt><dd>Pinch</dd>
+          <dt>Wheel</dt><dd>Hand size (depth)</dd>
+          <dt>Q / E</dt><dd>Tilt (roll) palm</dd>
+          <dt>L</dt><dd>Add mirrored left hand (move to the middle fast to clap)</dd>
+        </dl>
+      </aside>
+
+      <div id="toast" class="ui" aria-live="polite"></div>
+
+      <section id="loader">
+        <div class="loader__glow" aria-hidden="true"></div>
+        <div class="loader__card">
+          <p class="loader__eyebrow">hand-tracked worlds</p>
+          <h1>Palmverse</h1>
+          <p class="loader__lede">Little living worlds that sit in your hands. Raise your palms and see what grows.</p>
+          <p id="loader-msg" class="loader__msg" role="status"></p>
+          <div class="loader__actions">
+            <button id="start-camera" class="btn btn--primary">Start camera</button>
+            <button id="start-mouse" class="btn btn--ghost">Try with mouse</button>
+          </div>
+          <p class="loader__fine">Video never leaves your device. Everything runs in your browser.</p>
+        </div>
+      </section>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
