@@ -16,6 +16,8 @@ export interface SceneContext {
   quality: { level: QualityLevel; particleScale: number };
   /** Multipliers on the webcam look; reset automatically when the scene closes. */
   grade: VideoGrade;
+  /** The live webcam for effects that refract/reflect the room (screen UV → video UV, mirrored). */
+  video: { texture: THREE.Texture; uvTransform: THREE.Vector4; hasVideo: () => boolean };
   /** Show a short message on screen (hidden in recording mode unless important). */
   toast: (msg: string) => void;
 }

@@ -77,7 +77,9 @@ export class Renderer {
   readonly composer: EffectComposer;
   readonly bloom: BloomEffect;
   private readonly composite: VideoCompositeEffect;
-  private readonly videoTexture: THREE.VideoTexture;
+  readonly videoTexture: THREE.VideoTexture;
+  /** Screen UV → video UV (before mirroring): xy scale, zw offset. Updated every frame. */
+  readonly videoUv = new THREE.Vector4(1, 1, 0, 0);
   hasVideo = false;
   readonly grade: VideoGrade = { tint: new THREE.Color(1, 1, 1), brightness: 1, saturation: 1 };
 
@@ -155,7 +157,8 @@ export class Renderer {
 
     const u = this.composite.uniforms;
     u.get('hasVideo')!.value = this.hasVideo ? 1 : 0;
-    this.viewport.videoUvTransform(u.get('uvXform')!.value);
+    this.viewport.videoUvTransform(this.videoUv);
+    u.get('uvXform')!.value.copy(this.videoUv);
     (u.get('tint')!.value as THREE.Color).set(R.videoTint).multiply(this.grade.tint);
     u.get('brightness')!.value = R.videoBrightness * this.grade.brightness;
     u.get('saturation')!.value = R.videoSaturation * this.grade.saturation;

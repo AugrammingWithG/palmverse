@@ -29,5 +29,11 @@ export const SCENES: SceneDef[] = [
     hint: 'Open left hand = cloud · right pinch = rain · quick pinch = lightning · W = weather',
     load: () => import('./weather/Weather'),
   },
-  { key: '4', id: 'galaxy', title: 'Pour a Galaxy', hint: '' },
+  {
+    key: '4',
+    id: 'galaxy',
+    title: 'Pour a Galaxy',
+    hint: 'Tip your right palm toward the jar to pour · clap for a nebula · right fist calls the stars back',
+    load: () => import('./galaxy/Galaxy'),
+  },
 ];

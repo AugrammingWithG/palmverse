@@ -5,8 +5,8 @@ import type { HandFrame } from './handTypes';
 import type { Viewport } from './mapping';
 import type { Renderer } from './renderer';
 
-/** Disposes every geometry, material and texture under an object. */
-export function disposeDeep(root: THREE.Object3D): void {
+/** Disposes every geometry, material and texture under an object, except textures in `keep`. */
+export function disposeDeep(root: THREE.Object3D, keep: Set<THREE.Texture> = new Set()): void {
   const textures = new Set<THREE.Texture>();
   const disposeMaterial = (m: THREE.Material) => {
     for (const value of Object.values(m)) {
@@ -26,7 +26,7 @@ export function disposeDeep(root: THREE.Object3D): void {
     if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach(disposeMaterial);
     if ((obj as THREE.InstancedMesh).isInstancedMesh) (obj as THREE.InstancedMesh).dispose();
   });
-  textures.forEach((t) => t.dispose());
+  textures.forEach((t) => !keep.has(t) && t.dispose());
 }
 
 export class SceneManager {
@@ -70,6 +70,11 @@ export class SceneManager {
       gui: this.gui.addFolder(def.title),
       quality: { level: this.renderer.quality, particleScale: this.renderer.particleScale },
       grade: this.renderer.grade,
+      video: {
+        texture: this.renderer.videoTexture,
+        uvTransform: this.renderer.videoUv,
+        hasVideo: () => this.renderer.hasVideo,
+      },
       toast: this.toast,
     };
     const exp = new mod.default();
@@ -98,7 +103,7 @@ export class SceneManager {
     this.experience.dispose();
     const { root, gui, scene } = this.ctx;
     scene.remove(root);
-    disposeDeep(root);
+    disposeDeep(root, new Set([this.renderer.videoTexture]));
     gui.destroy();
     for (const tex of [scene.background, scene.environment]) {
       if (tex instanceof THREE.Texture) tex.dispose();
