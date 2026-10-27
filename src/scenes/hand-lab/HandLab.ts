@@ -1,5 +1,5 @@
-import * as THREE from 'three';
-import { createGlowTexture } from '../../core/glowTexture';
+﻿import * as THREE from 'three';
+import { createGlowTexture } from '../../core/fx';
 import type { HandData, HandFrame } from '../../core/handTypes';
 import { FINGERTIPS, NUM_LANDMARKS, type Side } from '../../core/landmarks';
 import type { Experience, SceneContext } from '../types';

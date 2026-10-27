@@ -63,6 +63,13 @@ class VideoCompositeEffect extends Effect {
 
 export type QualityLevel = 'high' | 'medium' | 'low';
 
+/** Per-scene multipliers on the webcam look (night tint, storm darkening…). Reset on scene switch. */
+export interface VideoGrade {
+  tint: THREE.Color;
+  brightness: number;
+  saturation: number;
+}
+
 export class Renderer {
   readonly renderer: THREE.WebGLRenderer;
   readonly scene = new THREE.Scene();
@@ -72,6 +79,7 @@ export class Renderer {
   private readonly composite: VideoCompositeEffect;
   private readonly videoTexture: THREE.VideoTexture;
   hasVideo = false;
+  readonly grade: VideoGrade = { tint: new THREE.Color(1, 1, 1), brightness: 1, saturation: 1 };
 
   pixelRatio: number;
   quality: QualityLevel = 'high';
@@ -148,9 +156,9 @@ export class Renderer {
     const u = this.composite.uniforms;
     u.get('hasVideo')!.value = this.hasVideo ? 1 : 0;
     this.viewport.videoUvTransform(u.get('uvXform')!.value);
-    (u.get('tint')!.value as THREE.Color).set(R.videoTint);
-    u.get('brightness')!.value = R.videoBrightness;
-    u.get('saturation')!.value = R.videoSaturation;
+    (u.get('tint')!.value as THREE.Color).set(R.videoTint).multiply(this.grade.tint);
+    u.get('brightness')!.value = R.videoBrightness * this.grade.brightness;
+    u.get('saturation')!.value = R.videoSaturation * this.grade.saturation;
 
     this.composer.render(dt);
     this.governQuality(dt);
@@ -179,6 +187,12 @@ export class Renderer {
       this.setPixelRatio(Math.min(maxPr, this.pixelRatio + 0.25));
       this.fpsWindow.length = 0;
     }
+  }
+
+  resetGrade(): void {
+    this.grade.tint.setRGB(1, 1, 1);
+    this.grade.brightness = 1;
+    this.grade.saturation = 1;
   }
 
   private setQuality(q: QualityLevel): void {

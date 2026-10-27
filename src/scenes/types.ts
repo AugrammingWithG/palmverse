@@ -2,7 +2,7 @@ import type * as THREE from 'three';
 import type GUI from 'lil-gui';
 import type { HandFrame } from '../core/handTypes';
 import type { Viewport } from '../core/mapping';
-import type { QualityLevel } from '../core/renderer';
+import type { QualityLevel, VideoGrade } from '../core/renderer';
 
 export interface SceneContext {
   /** Add everything here. Geometries, materials and textures under it are disposed on switch. */
@@ -14,6 +14,8 @@ export interface SceneContext {
   /** This scene's lil-gui folder; destroyed on switch. */
   gui: GUI;
   quality: { level: QualityLevel; particleScale: number };
+  /** Multipliers on the webcam look; reset automatically when the scene closes. */
+  grade: VideoGrade;
   /** Show a short message on screen (hidden in recording mode unless important). */
   toast: (msg: string) => void;
 }

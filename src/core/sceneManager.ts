@@ -69,6 +69,7 @@ export class SceneManager {
       viewport: this.viewport,
       gui: this.gui.addFolder(def.title),
       quality: { level: this.renderer.quality, particleScale: this.renderer.particleScale },
+      grade: this.renderer.grade,
       toast: this.toast,
     };
     const exp = new mod.default();
@@ -105,6 +106,7 @@ export class SceneManager {
     scene.background = null;
     scene.environment = null;
     scene.fog = null;
+    this.renderer.resetGrade();
     this.experience = null;
     this.ctx = null;
   }
