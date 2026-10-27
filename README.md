@@ -40,6 +40,18 @@ The camera needs a secure context: `localhost` works, a LAN IP (`http://192.168.
 
 The mouse hand generates a full 21-point 3D hand and goes through the exact same smoothing and gesture pipeline as the camera, so scenes behave identically.
 
+## Scenes
+
+| Key | Scene | How to play |
+| --- | --- | --- |
+| `0` | **Hand Lab** | Debug view. Glowing markers sit on your joints; the orb's ring shows palm orientation. Use it to check alignment. |
+| `1` | **Palm Terrarium** | A glass dome garden rides your **left** palm. Your open **right** palm is the sun: plants grow (faster with a more open hand), lean toward it, and moss spreads when the sun is close. **Right fist** = night (blue sky, fireflies, glowing flowers and mushrooms). **Both fists for 2 s** = fresh garden. |
+| `2` | **Finger Puppet** | `C` cycles creatures. **Jellyfish:** the bell sits on your palm and each finger drives a tentacle (point your fingers down for a classic jellyfish). **Koi / Dragon:** the body traces your **index fingertip's** path; **spread your fingers** to open fins / flare the mane; **pinch** to make the dragon breathe sparks. |
+| `3` | **Weather in Your Hands** | A tiny island rides your **left** palm. **Open left hand** = a cloud forms. **Right pinch** = rain intensity. **Quick pinch-and-release** = lightning. `W` cycles rain / snow (the island whitens) / sunny with a rainbow. |
+| `4` | **Pour a Galaxy** | A jar sits in your **left** hand, a spiral galaxy in your **right**. **Tip your right palm toward the jar** to pour the stars in an arc. The jar fills and glows. **Clap** = nebula explosion that drifts back into the jar. **Right fist** (with an empty hand) = call the stars back. |
+
+Every scene has its own lil-gui folder (`G`) and a `config.ts` in `src/scenes/<scene>/` with all of its colors, counts, speeds and thresholds.
+
 ## Gestures
 
 Every frame, each hand exposes (see [`src/core/handTypes.ts`](src/core/handTypes.ts)):
@@ -91,11 +103,19 @@ src/
     sceneManager.ts       init / update / dispose, auto-disposal, per-scene GUI folder
     skeletonOverlay.ts    2D debug overlay (H)
     ui.ts / devGui.ts     loader, menu, HUD, recording mode, lil-gui
+    anchor.ts             HandAnchor: keeps an object in a palm, glides to rest when the hand leaves
+    fx.ts                 glow textures, point sizing, pure-additive blending, soft lighting GLSL
   scenes/
     index.ts              scene registry (lazy-loaded chunks)
     types.ts              Experience / SceneContext interfaces
     hand-lab/             debug scene: verifies hand ↔ 3D alignment
+    palm-terrarium/       GPU-bent stems, moss shader, glass, fireflies
+    finger-puppet/        verlet tentacles, follow-the-leader spines, dynamic tubes, bubbles
+    weather/              low-poly island + water, cloud sprites, rain/snow, lightning, rainbow
+    galaxy/               GPU star state machine, webcam-refracting jar, nebula burst
 ```
+
+Glowing effects use **pure additive** blending (`fx.pureAdditive`): they add light without writing alpha, so they glow over the webcam instead of covering it. The galaxy jar's transmission is patched to refract the live webcam, so the real room bends through the glass.
 
 ### Writing a scene
 
