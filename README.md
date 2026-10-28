@@ -19,13 +19,15 @@ The camera needs a secure context: `localhost` works, a LAN IP (`http://192.168.
 
 | Key | Action |
 | --- | --- |
-| `0`–`4` | Switch scene (also the menu at the bottom) |
-| `H` | Hand skeleton overlay with live gesture values |
-| `G` | lil-gui tuning panel |
-| `R` | Recording mode: hides **all** UI |
+| `1`–`4` | Switch world (also the dock at the bottom); `0` = Hand Lab |
+| `H` | Hand skeleton overlay with live gesture values, plus fps / inference readouts |
+| `G` | lil-gui tuning panel (also shows the readouts) |
+| `R` | Recording mode: hides **all** UI (double-click also exits) |
 | `F` | 9:16 frame guide for vertical clips |
 | `M` | Toggle camera ↔ mouse hand |
-| `?` | Help panel |
+| `?` | How-to-play drawer |
+
+The landing page runs a live WebGL meadow (`src/scenes/prelude`) whose flowers lean toward your cursor; it wilts away when you start. In a world, the top bar and dock fade after a few seconds without input (move the mouse or tap to bring them back), each world opens with a short gesture caption, and on camera a "Raise your hands" prompt appears if no hands are found.
 
 ### Mouse hand (no camera needed)
 
@@ -106,8 +108,9 @@ src/
     anchor.ts             HandAnchor: keeps an object in a palm, glides to rest when the hand leaves
     fx.ts                 glow textures, point sizing, pure-additive blending, soft lighting GLSL
   scenes/
-    index.ts              scene registry (lazy-loaded chunks)
+    index.ts              scene registry (lazy-loaded chunks, titles, gesture captions)
     types.ts              Experience / SceneContext interfaces
+    prelude/              landing meadow: terrarium flowers that follow the cursor
     hand-lab/             debug scene: verifies hand ↔ 3D alignment
     palm-terrarium/       GPU-bent stems, moss shader, glass, fireflies
     finger-puppet/        verlet tentacles, follow-the-leader spines, dynamic tubes, bubbles
@@ -127,7 +130,7 @@ export default class MyScene implements Experience {
 }
 ```
 
-Register it in `src/scenes/index.ts`. Read `ctx.quality.particleScale` to size particle counts; the renderer lowers pixel ratio and then the quality level when the frame rate drops.
+Register it in `src/scenes/index.ts` with a `display` title (the letter in `{braces}` is set in italic serif) and its `gestures` caption. Read `ctx.quality.particleScale` to size particle counts; the renderer lowers pixel ratio and then the quality level when the frame rate drops.
 
 ## Deploy to Vercel
 

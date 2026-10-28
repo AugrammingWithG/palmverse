@@ -8,7 +8,7 @@ import { Renderer } from './core/renderer';
 import { SceneManager } from './core/sceneManager';
 import { SkeletonOverlay } from './core/skeletonOverlay';
 import { UI } from './core/ui';
-import { SCENES } from './scenes';
+import { PRELUDE, SCENES } from './scenes';
 
 const video = document.getElementById('webcam') as HTMLVideoElement;
 const glCanvas = document.getElementById('gl') as HTMLCanvasElement;
@@ -21,7 +21,8 @@ const gui = createDevGui({ onConfidenceChange: () => void tracker.mediapipe.appl
 const ui = new UI(SCENES, (def) => void manager.switchTo(def));
 const manager = new SceneManager(renderer, viewport, gui, (msg) => ui.toast(msg));
 const overlay = new SkeletonOverlay(skeletonCanvas, viewport, tracker);
-manager.onChange = (def) => ui.setActiveScene(def.id);
+manager.onChange = (def) => ui.setActiveScene(def);
+ui.onToggleSource = () => void toggleSource();
 
 let cameraActive = false;
 
@@ -42,7 +43,29 @@ resize();
 function useSource(source: 'camera' | 'mouse'): void {
   tracker.setSource(source);
   renderer.hasVideo = cameraActive;
-  ui.setSource(source === 'camera' ? `camera · ${tracker.mediapipe.delegate}` : 'mouse hand');
+  ui.setSource(source, source === 'camera' ? `camera · ${tracker.mediapipe.delegate}` : 'mouse hand');
+}
+
+async function toggleSource(): Promise<void> {
+  if (tracker.source === 'camera') {
+    useSource('mouse');
+    ui.toast('Mouse hand');
+  } else if (cameraActive || (await enableCamera())) {
+    useSource('camera');
+    ui.toast('Camera');
+  } else {
+    ui.toast('Camera unavailable, staying on mouse');
+  }
+}
+
+function syncDebug(): void {
+  ui.setDebug(debugConfig.showSkeleton || !gui._hidden);
+}
+
+/** Leave the landing: the meadow wilts while the first world loads. */
+function enterWorlds(): void {
+  ui.hideLoader();
+  void manager.switchTo(SCENES[0]);
 }
 
 async function enableCamera(): Promise<boolean> {
@@ -72,14 +95,13 @@ async function enableCamera(): Promise<boolean> {
 ui.startCameraBtn.addEventListener('click', async () => {
   if (!(await enableCamera())) return;
   useSource('camera');
-  ui.hideLoader();
-  ui.toast('Raise your hands into view ✋');
+  enterWorlds();
 });
 
 ui.startMouseBtn.addEventListener('click', () => {
   useSource('mouse');
-  ui.hideLoader();
-  ui.toast('Mouse hand · hold click = fist · Shift = pinch · L = second hand', 4200);
+  enterWorlds();
+  ui.toast('Mouse hand · hold click for a fist · Shift to pinch · L adds a left hand', 4600);
 });
 
 // ---------- Keys ----------
@@ -87,21 +109,24 @@ window.addEventListener('keydown', async (e) => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   const target = e.target as HTMLElement;
   if (target.closest('input, textarea, select, .lil-gui')) return;
+  // The landing only answers its own buttons; the meadow keeps playing behind it
+  if (ui.onLanding) return;
 
   const key = e.key.toLowerCase();
   const sceneDef = SCENES.find((s) => s.key === key);
   if (sceneDef) {
-    if (sceneDef.load) void manager.switchTo(sceneDef);
-    else ui.toast(`${sceneDef.title} is coming in Phase 2`);
+    void manager.switchTo(sceneDef);
     return;
   }
   if (e.repeat) return;
   switch (key) {
     case 'h':
       debugConfig.showSkeleton = !debugConfig.showSkeleton;
+      syncDebug();
       return;
     case 'g':
       gui._hidden ? gui.show() : gui.hide();
+      syncDebug();
       return;
     case 'r':
       ui.toggleRecording();
@@ -116,15 +141,7 @@ window.addEventListener('keydown', async (e) => {
       ui.toggleHelp(false);
       return;
     case 'm':
-      if (tracker.source === 'camera') {
-        useSource('mouse');
-        ui.toast('Mouse hand');
-      } else if (cameraActive || (await enableCamera())) {
-        useSource('camera');
-        ui.toast('Camera tracking');
-      } else {
-        ui.toast('Camera unavailable, staying on mouse');
-      }
+      await toggleSource();
       return;
     case 'l':
       if (tracker.source === 'mouse') {
@@ -168,12 +185,12 @@ function frame(): void {
   fpsTime += dt;
   if (fpsTime >= 0.5) {
     ui.setStats(Math.round(fpsFrames / fpsTime), tracker.source === 'camera' ? tracker.mediapipe.inferenceMs : null);
-    ui.setHands(!!hands.left?.tracked, !!hands.right?.tracked);
+    ui.setHands(!!hands.left?.tracked, !!hands.right?.tracked, tracker.source === 'camera');
     fpsFrames = 0;
     fpsTime = 0;
   }
 }
 
 useSource('mouse');
-void manager.switchTo(SCENES[0]);
+void manager.switchTo(PRELUDE);
 requestAnimationFrame(frame);

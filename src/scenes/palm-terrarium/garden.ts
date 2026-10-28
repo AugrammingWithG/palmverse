@@ -267,6 +267,11 @@ export class Garden {
     this.capMat.uniforms.uEmissive.value = 0.1 + night * 2.4;
   }
 
+  /** Self-illumination of the petals (the terrarium keeps them lit only by the sun). */
+  setPetalGlow(v: number): void {
+    (this.petals.material as THREE.ShaderMaterial).uniforms.uEmissive.value = v;
+  }
+
   /** 0..1 average maturity, for UI/feedback. */
   get maturity(): number {
     return this.plants.reduce((s, p) => s + p.growth, 0) / Math.max(1, this.plants.length);

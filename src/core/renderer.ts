@@ -34,11 +34,11 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
     float l = dot(bg, vec3(0.2126, 0.7152, 0.0722));
     bg = mix(vec3(l), bg, saturation) * tint * brightness;
   } else {
-    // Soft dusk gradient for mouse mode
+    // Night-garden backdrop for mouse mode: green-black with a low teal clearing
     float v = smoothstep(0.0, 1.0, uv.y);
-    bg = mix(vec3(0.018, 0.011, 0.028), vec3(0.004, 0.006, 0.016), v);
-    float d = length((uv - vec2(0.5, 0.15)) * vec2(aspect, 1.0));
-    bg += vec3(0.035, 0.016, 0.03) * exp(-d * d * 3.0);
+    bg = mix(vec3(0.014, 0.024, 0.022), vec3(0.004, 0.006, 0.008), v);
+    float d = length((uv - vec2(0.5, 0.12)) * vec2(aspect, 1.4));
+    bg += vec3(0.012, 0.05, 0.05) * exp(-d * d * 1.8);
   }
   float a = clamp(texture2D(inputBuffer, uv).a, 0.0, 1.0);
   outputColor = vec4(inputColor.rgb + bg * (1.0 - a), 1.0);

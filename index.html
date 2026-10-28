@@ -3,75 +3,125 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
-    <meta name="theme-color" content="#07060d" />
+    <meta name="theme-color" content="#040706" />
     <title>Palmverse</title>
-    <meta name="description" content="Living 3D worlds that sit in your hands. Hand-tracked in the browser." />
+    <meta name="description" content="Little living worlds that sit in your hands. Hand-tracked 3D in your browser." />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@300..600&family=Instrument+Serif:ital@0;1&display=swap"
       rel="stylesheet"
     />
   </head>
-  <body>
+  <body class="landing">
     <div id="app">
       <video id="webcam" playsinline muted autoplay></video>
       <canvas id="gl"></canvas>
       <canvas id="skeleton"></canvas>
 
       <div id="frame-guide" hidden>
-        <div class="frame-guide__window"></div>
+        <div class="frame-guide__window"><i></i><i></i><i></i><i></i></div>
       </div>
 
-      <div id="hud" class="ui">
-        <nav id="menu" aria-label="Scenes"></nav>
-        <div id="status">
-          <span id="fps">-- fps</span>
-          <span id="source"></span>
-          <span id="hands"></span>
+      <header class="topbar ui">
+        <div class="topbar__brand">
+          <span class="wordmark">Palm<em>v</em>erse</span>
+          <div class="debug" aria-label="Debug readouts">
+            <span id="fps">-- fps</span>
+            <span id="source"></span>
+            <span id="hands"></span>
+          </div>
         </div>
-        <button id="help-btn" class="chip" aria-label="Controls">?</button>
+        <nav class="tools" aria-label="Tools">
+          <button id="frame-btn" class="tool" aria-pressed="false" title="9:16 frame guide (F)" aria-label="9:16 frame guide">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7.25" y="3.25" width="9.5" height="17.5" rx="2.2" /><path d="M10.5 6.5h3" /></svg>
+          </button>
+          <button id="rec-btn" class="tool" title="Recording mode: hides all UI (R)" aria-label="Recording mode">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.25" /><circle class="fill" cx="12" cy="12" r="3.4" /></svg>
+          </button>
+          <button id="help-btn" class="tool" aria-expanded="false" aria-controls="help" title="How to play (?)" aria-label="How to play">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.25" /><path d="M9.7 9.6a2.4 2.4 0 0 1 4.65.8c0 1.65-2.35 2.1-2.35 3.75" /><circle class="fill" cx="12" cy="16.9" r=".95" /></svg>
+          </button>
+        </nav>
+      </header>
+
+      <div id="prompt" class="prompt ui" aria-live="polite">
+        <p>Raise your <em>h</em>ands into view</p>
+        <span>Palms toward the camera, about an arm's length away</span>
       </div>
 
-      <aside id="help" class="ui panel" hidden>
-        <h2>Controls</h2>
-        <dl>
-          <dt>0–4</dt><dd>Switch scene</dd>
-          <dt>H</dt><dd>Hand skeleton overlay</dd>
-          <dt>G</dt><dd>Tuning panel</dd>
-          <dt>R</dt><dd>Recording mode (hides all UI)</dd>
-          <dt>F</dt><dd>9:16 frame guide</dd>
-          <dt>M</dt><dd>Camera ↔ mouse hand</dd>
-          <dt>C</dt><dd>Next creature (Finger Puppet)</dd>
-          <dt>W</dt><dd>Next weather (Weather)</dd>
-        </dl>
-        <h3>Mouse hand</h3>
-        <dl>
-          <dt>Move</dt><dd>Right hand</dd>
-          <dt>Hold click</dt><dd>Close fist</dd>
-          <dt>Shift / right-click</dt><dd>Pinch</dd>
-          <dt>Wheel</dt><dd>Hand size (depth)</dd>
-          <dt>Q / E</dt><dd>Tilt (roll) palm</dd>
-          <dt>L</dt><dd>Add mirrored left hand (move to the middle fast to clap)</dd>
-        </dl>
+      <div id="caption" class="caption ui" aria-live="polite"></div>
+      <nav id="dock" class="dock ui" aria-label="Worlds"></nav>
+
+      <aside id="help" class="drawer ui" aria-labelledby="help-title" hidden>
+        <header class="drawer__head">
+          <h2 id="help-title">How to <em>p</em>lay</h2>
+          <button id="help-close" class="tool tool--plain" aria-label="Close">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" /></svg>
+          </button>
+        </header>
+        <section id="help-world" class="drawer__world"></section>
+        <section>
+          <h3>Keys</h3>
+          <dl class="keys">
+            <dt><kbd>1</kbd>–<kbd>4</kbd></dt><dd>Switch world</dd>
+            <dt><kbd>0</kbd></dt><dd>Hand Lab, to check tracking</dd>
+            <dt><kbd>R</kbd></dt><dd>Recording mode, hides everything</dd>
+            <dt><kbd>F</kbd></dt><dd>9:16 frame guide</dd>
+            <dt><kbd>M</kbd></dt><dd>Camera or mouse hand</dd>
+            <dt><kbd>H</kbd></dt><dd>Hand skeleton and readouts</dd>
+            <dt><kbd>G</kbd></dt><dd>Tuning panel</dd>
+          </dl>
+        </section>
+        <section class="drawer__mouse">
+          <h3>Mouse hand</h3>
+          <dl class="keys">
+            <dt>Hold click</dt><dd>Close into a fist</dd>
+            <dt><kbd>Shift</kbd></dt><dd>Pinch (right-click works too)</dd>
+            <dt>Wheel</dt><dd>Hand size, like moving closer</dd>
+            <dt><kbd>Q</kbd> <kbd>E</kbd></dt><dd>Roll the palm</dd>
+            <dt><kbd>L</kbd></dt><dd>Add a mirrored left hand; sweep to the middle fast to clap</dd>
+          </dl>
+        </section>
+        <button id="source-btn" class="ghost">Use the camera instead</button>
+        <p class="drawer__fine">Video never leaves your device.</p>
       </aside>
 
-      <div id="toast" class="ui" aria-live="polite"></div>
+      <div id="toast" class="toast" aria-live="polite"></div>
 
-      <section id="loader">
-        <div class="loader__glow" aria-hidden="true"></div>
-        <div class="loader__card">
-          <p class="loader__eyebrow">hand-tracked worlds</p>
-          <h1>Palmverse</h1>
-          <p class="loader__lede">Little living worlds that sit in your hands. Raise your palms and see what grows.</p>
-          <p id="loader-msg" class="loader__msg" role="status"></p>
-          <div class="loader__actions">
-            <button id="start-camera" class="btn btn--primary">Start camera</button>
-            <button id="start-mouse" class="btn btn--ghost">Try with mouse</button>
+      <section id="loader" class="landing-screen">
+        <div class="landing-screen__shade" aria-hidden="true"></div>
+        <header class="landing-screen__top">
+          <span class="wordmark">Palm<em>v</em>erse</span>
+          <p class="landing-screen__privacy">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5.25" y="10.25" width="13.5" height="9.75" rx="2.2" /><path d="M8.5 10.25V8a3.5 3.5 0 0 1 7 0v2.25" /></svg>
+            Runs in your browser. Video never leaves your device.
+          </p>
+        </header>
+
+        <div class="landing-screen__center">
+          <h1 class="headline">
+            <span class="headline__line">Little w<em>o</em>rlds that live in</span>
+            <span class="pill"><span class="pill__word">your <em>h</em>ands</span></span>
+          </h1>
+          <p class="landing-screen__lede">
+            Raise your palms to the webcam. A garden, a jellyfish, a storm and a galaxy answer to your fingers.
+          </p>
+          <div class="landing-screen__actions">
+            <button id="start-camera" class="pearl" aria-busy="false"><span>Start camera</span></button>
+            <button id="start-mouse" class="textlink">or try it with your mouse</button>
           </div>
-          <p class="loader__fine">Video never leaves your device. Everything runs in your browser.</p>
+          <p id="loader-msg" class="landing-screen__msg" role="status"></p>
         </div>
+
+        <footer class="landing-screen__foot">
+          <span>Best with a webcam and good light</span>
+          <span class="landing-screen__worlds">
+            <em>Terrarium</em><i aria-hidden="true"></i><em>Puppet</em><i aria-hidden="true"></i><em>Weather</em><i aria-hidden="true"></i><em>Galaxy</em>
+          </span>
+          <span class="landing-screen__hint">Move your cursor. The flowers follow.</span>
+        </footer>
       </section>
     </div>
     <script type="module" src="/src/main.ts"></script>

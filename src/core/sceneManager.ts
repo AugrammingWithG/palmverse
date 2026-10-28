@@ -54,7 +54,7 @@ export class SceneManager {
   async switchTo(def: SceneDef): Promise<void> {
     if (!def.load || def === this.current) return;
     const token = ++this.switchToken;
-    const mod = await def.load();
+    const [mod] = await Promise.all([def.load(), this.experience?.outro?.()]);
     if (token !== this.switchToken) return;
 
     this.teardown();
@@ -83,7 +83,6 @@ export class SceneManager {
     this.current = def;
     await exp.init(ctx);
     this.onChange?.(def);
-    if (def.hint) this.toast(def.hint);
   }
 
   update(hands: HandFrame, dt: number): void {

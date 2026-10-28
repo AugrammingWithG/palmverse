@@ -8,7 +8,7 @@ import { Island, islandHeight } from './island';
 import { Cloud, Lightning, Rain, Ripples, Snow, createRainbow } from './sky';
 
 const MODES: WeatherMode[] = ['rain', 'snow', 'sunny'];
-const MODE_LABEL: Record<WeatherMode, string> = { rain: '🌧 Rain', snow: '❄ Snow', sunny: '☀ Sunny' };
+const MODE_LABEL: Record<WeatherMode, string> = { rain: 'Rain', snow: 'Snow', sunny: 'Sunny' };
 const LIGHT_DIR = new THREE.Vector3(0.4, 0.8, 0.45).normalize();
 
 export default class Weather implements Experience {

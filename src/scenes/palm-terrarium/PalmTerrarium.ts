@@ -194,7 +194,7 @@ export default class PalmTerrarium implements Experience {
       if (this.resetCharge >= 1) {
         this.wiltTimer = 0.7;
         this.resetCharge = 0;
-        this.ctx.toast('Fresh garden 🌱');
+        this.ctx.toast('Fresh garden');
       }
     }
     let wilt = 1;

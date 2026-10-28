@@ -32,14 +32,20 @@ export interface Experience {
   onKey?(e: KeyboardEvent): boolean;
   onResize?(): void;
   onQualityChange?(level: QualityLevel): void;
+  /** Exit animation; the manager waits for it before tearing the scene down. */
+  outro?(): Promise<void>;
 }
 
 export interface SceneDef {
   key: string;
   id: string;
   title: string;
-  /** One line shown when the scene opens. */
-  hint: string;
+  /** Title for display type: the letter in {braces} is set in italic serif. */
+  display: string;
+  /** Compact menu label. */
+  short: string;
+  /** [gesture, what it does], shown as a caption when the scene opens and in the help drawer. */
+  gestures: [string, string][];
   /** Lazy-loaded so each scene is its own chunk. Undefined = not built yet. */
   load?: () => Promise<{ default: new () => Experience }>;
 }
